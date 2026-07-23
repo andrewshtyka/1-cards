@@ -23,7 +23,7 @@ import * as THREE from "three";
 /**
  * ======================================== Scene
  */
-export const scene = new THREE.Scene();
+const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffffff);
 
 /**
@@ -62,7 +62,18 @@ window.addEventListener("resize", () => {
  * ======================================== Camera
  */
 const camera = new THREE.PerspectiveCamera(45, sizes.aspect, 1, 1000);
+camera.position.z = 4;
 scene.add(camera);
+
+/**
+ * ======================================== Plane
+ */
+
+const planeMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(1, 1.25),
+  new THREE.MeshBasicMaterial({ color: 0xff0000 }),
+);
+scene.add(planeMesh);
 
 /**
  * ======================================== Renderer
@@ -70,6 +81,7 @@ scene.add(camera);
 const renderer = new THREE.WebGLRenderer({ canvas: canvas });
 renderer.setSize(sizes.width, sizes.height);
 renderer.render(scene, camera);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 /**
  * ======================================== Animate
@@ -79,6 +91,8 @@ const timer = new THREE.Timer();
 const animate = () => {
   timer.update();
   const elapsedTime = timer.getElapsed();
+
+  planeMesh.position.y = Math.sin(elapsedTime * 2) * 0.1;
 
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
