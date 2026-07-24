@@ -112,10 +112,6 @@ camera.position.y = cameraConfig.position.y;
 camera.position.z = cameraConfig.position.z(config.type);
 scene.add(camera);
 
-gui.add(camera.position, "z").min(0).max(10).step(0.001).name("Zoom");
-gui.add(config, "rotationSpeed").min(0.1).max(3).step(0.0001).name("Rotation speed");
-
-
 /**
  * ======================================== Cards
  */
@@ -259,3 +255,24 @@ const animate = () => {
 };
 
 animate();
+
+/**
+ * ======================================== Debug UI Tweaks
+ */
+
+gui.add(camera.position, "z").min(0).max(10).step(0.001).name("Zoom");
+gui
+  .add(config, "rotationSpeed")
+  .min(0.1)
+  .max(3)
+  .step(0.0001)
+  .name("Rotation speed");
+gui
+  .add(config, "totalCards")
+  .min(8)
+  .max(16)
+  .step(1)
+  .onFinishChange((value) => {
+    config.totalCards = value;
+  })
+  .name("Amount of cards");
