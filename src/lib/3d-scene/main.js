@@ -19,12 +19,29 @@
  */
 
 import * as THREE from "three";
+import { config, coverTexture, getTheta } from "./cardsConfig";
+import { cameraConfig, sizes } from "./sceneConfig";
 
 /**
  * ======================================== Scene
  */
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffffff);
+
+/**
+ * ======================================== Textures
+ */
+const loadingManager = new THREE.LoadingManager();
+const textureLoader = new THREE.TextureLoader(loadingManager);
+const texturesArr = [];
+
+[...Array(config.totalCards)].forEach((item, i) => {
+  const texture = textureLoader.load(`/images/${i + 1}.webp`, (current) => {
+    coverTexture(current);
+  });
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texturesArr.push(texture);
+});
 
 /**
  * ======================================== Canvas
@@ -34,12 +51,6 @@ const canvas = document.querySelector("canvas.webgl");
 /**
  * ======================================== Sizes
  */
-
-const sizes = {
-  width: window.innerWidth,
-  height: window.innerHeight,
-  aspect: window.innerWidth / window.innerHeight,
-};
 
 window.addEventListener("resize", () => {
   // update sizes
@@ -61,19 +72,33 @@ window.addEventListener("resize", () => {
 /**
  * ======================================== Camera
  */
-const camera = new THREE.PerspectiveCamera(45, sizes.aspect, 1, 1000);
-camera.position.z = 4;
+const camera = new THREE.PerspectiveCamera(
+  cameraConfig.angle,
+  cameraConfig.aspect,
+  cameraConfig.near,
+  cameraConfig.far,
+);
+camera.position.z = cameraConfig.position.z;
 scene.add(camera);
 
 /**
- * ======================================== Plane
+ * ======================================== Cards
  */
+const geometry = new THREE.PlaneGeometry(config.width, config.height);
 
-const planeMesh = new THREE.Mesh(
-  new THREE.PlaneGeometry(1, 1.25),
-  new THREE.MeshBasicMaterial({ color: 0xff0000 }),
-);
-scene.add(planeMesh);
+const meshesArr = [];
+
+for (let i = 0; i < config.totalCards; i++) {
+  const planeMesh = new THREE.Mesh(
+    geometry,
+    new THREE.MeshBasicMaterial({ map: texturesArr[i] }),
+  );
+  scene.add(planeMesh);
+  meshesArr.push(planeMesh);
+
+  planeMesh.position.x = Math.sin(getTheta(i));
+  planeMesh.position.y = -Math.cos(getTheta(i));
+}
 
 /**
  * ======================================== Renderer
@@ -92,7 +117,14 @@ const animate = () => {
   timer.update();
   const elapsedTime = timer.getElapsed();
 
-  planeMesh.position.y = Math.sin(elapsedTime * 2) * 0.1;
+  meshesArr.forEach((mesh, i) => {
+    mesh.position.x = Math.sin(
+      getTheta(i) + elapsedTime * config.rotationSpeed,
+    );
+    mesh.position.y =
+      Math.cos(getTheta(i) + elapsedTime * config.rotationSpeed) *
+      config.rotationDirection;
+  });
 
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
