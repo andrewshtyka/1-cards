@@ -15,6 +15,8 @@ const gui = new GUI({
 gui.close();
 
 const debugObject = {
+  amountOfCards: config.totalCards,
+
   reset: () => window.location.reload(),
 
   setCircle: () => {
@@ -62,7 +64,7 @@ const scene = new THREE.Scene();
  */
 const loadingManager = new THREE.LoadingManager();
 const textureLoader = new THREE.TextureLoader(loadingManager);
-const texturesArr = [];
+let texturesArr = [];
 
 [...Array(config.totalCards)].forEach((item, i) => {
   const texture = textureLoader.load(`/images/${i + 1}.webp`, (current) => {
@@ -116,9 +118,9 @@ scene.add(camera);
  * ======================================== Cards
  */
 const geometry = new THREE.PlaneGeometry(config.width, config.height);
-const meshesArr = [];
+let meshesArr = [];
 
-for (let i = 0; i < config.totalCards; i++) {
+function createCard(i) {
   const mesh = new THREE.Mesh(
     geometry,
     new THREE.MeshBasicMaterial({ map: texturesArr[i] }),
@@ -135,6 +137,12 @@ for (let i = 0; i < config.totalCards; i++) {
   } else if (config.type === "ellipse") {
     mesh.position.y = Math.cos(getTheta(i) - config.ellipseCoef);
   }
+
+  return mesh;
+}
+
+for (let i = 0; i < config.totalCards; i++) {
+  createCard(i);
 }
 
 /**
@@ -267,12 +275,31 @@ gui
   .max(3)
   .step(0.0001)
   .name("Rotation speed");
+
+function updateCardsAmount(newAmount) {
+  config.totalCards = newAmount;
+
+  // too many cards ? delete from the end
+  while (meshesArr.length > newAmount) {
+    const mesh = meshesArr.pop();
+    scene.remove(mesh);
+    mesh.material.dispose();
+    delete hoverState[mesh.uuid];
+
+    if (hoveredMeshUUID === mesh.uuid) hoveredMeshUUID = null;
+  }
+
+  // not enough cards? add new
+  while (meshesArr.length < newAmount) {
+    createCard(meshesArr.length);
+  }
+}
 gui
   .add(config, "totalCards")
   .min(8)
   .max(16)
   .step(1)
-  .onFinishChange((value) => {
-    config.totalCards = value;
+  .onChange((value) => {
+    updateCardsAmount(value);
   })
   .name("Amount of cards");
