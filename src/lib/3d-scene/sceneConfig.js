@@ -7,9 +7,17 @@ export const sizes = {
 export const cameraConfig = {
   angle: 40,
   aspect: sizes.aspect,
-  near: 1,
+  near: 0.0001,
   far: 1000,
   position: {
-    z: 4,
+    x: 0,
+    y: 0,
+    z: (type) => {
+      if (type === "circle") {
+        return 4;
+      } else if (type === "gallery") {
+        return 2.25;
+      }
+    },
   },
 };

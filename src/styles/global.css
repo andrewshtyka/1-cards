@@ -13,3 +13,17 @@ body {
   inset: 0;
   outline: none;
 }
+
+.dots {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+
+  background-image: radial-gradient(rgba(0, 0, 0, 0.3) 0.5px, transparent 0.5px);
+
+  background-size: 0.6rem 0.6rem;
+  pointer-events: none;
+}

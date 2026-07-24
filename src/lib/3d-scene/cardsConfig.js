@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 const cardSize = 3.5;
 
 export const config = {
@@ -8,6 +10,9 @@ export const config = {
   angleSpread: Math.PI * 2,
   rotationSpeed: 0.15,
   rotationDirection: 1,
+
+  frames: 60,
+  type: "gallery", // circle | gallery
 };
 
 export function getTheta(i) {
@@ -22,12 +27,12 @@ export function coverTexture(texture) {
     // img wider? cut sides
     const scale = planeAspect / imgAspect;
     texture.repeat.set(scale, 1);
-    texture.offset.set((1 - scale) / 2, 0);
+    texture.offset.set((1 - scale) * 0.5, 0);
   } else {
     // img higher? cut top and bottom
     const scale = imgAspect / planeAspect;
     texture.repeat.set(1, scale);
-    texture.offset.set(0, (1 - scale) / 2);
+    texture.offset.set(0, (1 - scale) * 0.5);
   }
 
   texture.wrapS = THREE.ClampToEdgeWrapping;
