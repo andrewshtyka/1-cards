@@ -26,16 +26,8 @@ npm run dev
 
 ### ✅ Done:
 
-1. Cards rotate in `Gallery view`.
-2. Cards rotate in `Circle view`.
-3. Cards react on hover (I used `Raycaster`)
-
-### ⚠️ Nuances:
-
-**Meshes overlap and cause flickering** \
-In `Circle view` hover image from left or right - it'll overlap with another one above. \
-I don't understand how to fix it yet.
-
-I tried changing `mesh.position.z` for hovered card, but:
-- cards from the bottom seem to lose their Y position change (it's way too small)
-- cards from the top go up way too much.
+1. Cards rotate in `Circle view` (default).
+2. Cards rotate in `Gallery view`.
+3. Cards rotate in `Elipse view`.
+4. Cards react on hover (I used `Raycaster` to track card that is hovered, and GSAP to animate it)
+5. Debug UI panel controls view, zoom and rotation speed.

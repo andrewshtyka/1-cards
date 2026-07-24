@@ -12,7 +12,9 @@ export const config = {
   rotationDirection: 1,
 
   frames: 60,
-  type: "gallery", // circle | gallery
+  type: "circle", // circle | gallery | ellipse
+  ellipseCoef: 1,
+  tilt: 0.75
 };
 
 export function getTheta(i) {

@@ -17,6 +17,8 @@ export const cameraConfig = {
         return 4;
       } else if (type === "gallery") {
         return 2.25;
+      } else if (type === "ellipse") {
+        return 3;
       }
     },
   },

@@ -11,24 +11,32 @@ import { animateCards } from "./animateCards";
 const gui = new GUI({
   width: 340,
   title: "DEBUG UI",
-  // closeFolders: true,
 });
-// gui.close();
+gui.close();
 
 const debugObject = {
-  reload: () => window.location.reload(),
+  reset: () => window.location.reload(),
+
   setCircle: () => {
     config.type = "circle";
-    // camera.position.z = cameraConfig.position.z(config.type);
     gsap.to(camera.position, {
       z: cameraConfig.position.z(config.type),
       duration: 1.5,
       ease: "power2.out",
     });
   },
+
   setGallery: () => {
     config.type = "gallery";
-    // camera.position.z = cameraConfig.position.z(config.type);
+    gsap.to(camera.position, {
+      z: cameraConfig.position.z(config.type),
+      duration: 1.5,
+      ease: "power2.out",
+    });
+  },
+
+  setEllipse: () => {
+    config.type = "ellipse";
     gsap.to(camera.position, {
       z: cameraConfig.position.z(config.type),
       duration: 1.5,
@@ -36,15 +44,18 @@ const debugObject = {
     });
   },
 };
-gui.add(debugObject, "reload").name("Reload");
-gui.add(debugObject, "setCircle").name("Make a circle");
-gui.add(debugObject, "setGallery").name("Make a gallery");
+
+gui.add(debugObject, "reset").name("Reset");
+
+const viewTweaks = gui.addFolder("View");
+viewTweaks.add(debugObject, "setGallery").name("Make a gallery");
+viewTweaks.add(debugObject, "setEllipse").name("Make an ellipse");
+viewTweaks.add(debugObject, "setCircle").name("Make a circle (default)");
 
 /**
  * ======================================== Scene
  */
 const scene = new THREE.Scene();
-// scene.background = new THREE.Color(0xffffff);
 
 /**
  * ======================================== Textures
@@ -102,6 +113,8 @@ camera.position.z = cameraConfig.position.z(config.type);
 scene.add(camera);
 
 gui.add(camera.position, "z").min(0).max(10).step(0.001).name("Zoom");
+gui.add(config, "rotationSpeed").min(0.1).max(3).step(0.0001).name("Rotation speed");
+
 
 /**
  * ======================================== Cards
@@ -123,6 +136,8 @@ for (let i = 0; i < config.totalCards; i++) {
     mesh.position.y = -Math.cos(getTheta(i));
   } else if (config.type === "gallery") {
     mesh.position.z = -Math.cos(getTheta(i));
+  } else if (config.type === "ellipse") {
+    mesh.position.y = Math.cos(getTheta(i) - config.ellipseCoef);
   }
 }
 
@@ -146,12 +161,10 @@ pointer.y = 1;
 window.addEventListener("mousemove", (event) => {
   pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  console.log(pointer);
 });
 
 let hoveredMeshUUID = null;
 const hoverState = {};
-
 let hoverDelayFrames = 0;
 /**
  * ======================================== Animate
@@ -191,9 +204,11 @@ const animate = () => {
     const goUp = hoverState[mesh.uuid]?.goUp || 0;
     const offsetRotation = hoverState[mesh.uuid]?.rotation || 0;
 
-    mesh.rotation.y = offsetRotation;
-
     if (config.type === "circle") {
+      //
+      // circle
+      mesh.rotation.y = 0;
+
       mesh.position.x =
         Math.sin(getTheta(i) + elapsedTime * config.rotationSpeed) + offsetX;
 
@@ -204,6 +219,10 @@ const animate = () => {
 
       mesh.position.z = 0;
     } else if (config.type === "gallery") {
+      //
+      // gallery
+      mesh.rotation.y = offsetRotation;
+
       mesh.position.x = Math.sin(
         getTheta(i) + elapsedTime * config.rotationSpeed,
       );
@@ -214,6 +233,24 @@ const animate = () => {
         Math.cos(getTheta(i) + elapsedTime * config.rotationSpeed) *
           config.rotationDirection +
         offsetY;
+    } else if (config.type === "ellipse") {
+      //
+      // ellipse
+      mesh.rotation.y = 0;
+
+      mesh.position.x = Math.sin(
+        getTheta(i) + elapsedTime * config.rotationSpeed,
+      );
+
+      mesh.position.y =
+        Math.cos(
+          getTheta(i) - config.ellipseCoef + elapsedTime * config.rotationSpeed,
+        ) *
+          config.tilt *
+          config.rotationDirection +
+        goUp;
+
+      mesh.position.z = 0;
     }
   });
 
