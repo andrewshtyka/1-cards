@@ -18,7 +18,7 @@ export const config = {
 };
 
 export function getTheta(i) {
-  return config.angleSpread + config.angleSpread * (i / config.totalCards);
+  return config.angleSpread * (i / config.totalCards);
 }
 
 export function coverTexture(texture) {

@@ -45,6 +45,14 @@ const debugObject = {
       ease: "power2.out",
     });
   },
+
+  setHalf: () => {
+    config.angleSpread = Math.PI;
+  },
+
+  setFull: () => {
+    config.angleSpread = Math.PI * 2;
+  },
 };
 
 gui.add(debugObject, "reset").name("Reset");
@@ -269,12 +277,7 @@ animate();
  */
 
 gui.add(camera.position, "z").min(0).max(10).step(0.001).name("Zoom");
-gui
-  .add(config, "rotationSpeed")
-  .min(0.1)
-  .max(3)
-  .step(0.0001)
-  .name("Rotation speed");
+
 
 function updateCardsAmount(newAmount) {
   config.totalCards = newAmount;
@@ -303,3 +306,17 @@ gui
     updateCardsAmount(value);
   })
   .name("Amount of cards");
+// gui.add(debugObject, "setHalf").name("Put images into half a circle");
+// gui.add(debugObject, "setFull").name("Put images into full circle (default)");
+gui
+  .add(config, "rotationSpeed")
+  .min(0.1)
+  .max(3)
+  .step(0.0001)
+  .name("Rotation speed");
+gui
+  .add(config, "angleSpread")
+  .min(Math.PI * 0.25)
+  .max(Math.PI * 2)
+  .step(0.0001)
+  .name("Angle spread");
